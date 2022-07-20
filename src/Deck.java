@@ -11,6 +11,7 @@ public class Deck {
 	public Deck() {
 		this.numberOfCardsLeft = maxNumOfCards;
 		this.generateDeck();
+		this.shuffleDeck();
 	}
 	
 	//returns the top card from the deck and "removes" it
@@ -31,26 +32,23 @@ public class Deck {
 	public void generateDeck() {
 		this.cards = new Card[maxNumOfCards];
 		for (int i = 0; i < maxNumOfCards; i++) {
-			int suit1 = maxNumOfCards/4;
-			int suit2 = maxNumOfCards/2;
-			int suit3 = 3*maxNumOfCards/4;
-			int suit4 = maxNumOfCards;
-			if (i < suit1) {
-				Card card = new Card(i % suit1 ,CardSuit.Clubs);
+			int cardsInSuit = maxNumOfCards/4;
+			if (i < cardsInSuit) {
+				Card card = new Card(i % cardsInSuit ,CardSuit.Clubs);
 				cards[i] = card;
 			}
-			else if (i < suit2) {
-				Card card = new Card(i % suit1 ,CardSuit.Diamonds);
+			else if (i < 2 * cardsInSuit) {
+				Card card = new Card(i % cardsInSuit ,CardSuit.Diamonds);
 				cards[i] = card;
 				continue;
 			}
-			else if (i < suit3) {
-				Card card = new Card(i % suit1 ,CardSuit.Hearts);
+			else if (i < 2 * cardsInSuit) {
+				Card card = new Card(i % cardsInSuit ,CardSuit.Hearts);
 				cards[i] = card;
 				continue;
 			}
 			else {
-				Card card = new Card(i % suit1 ,CardSuit.Spades);
+				Card card = new Card(i % cardsInSuit ,CardSuit.Spades);
 				cards[i] = card;
 				continue;
 			}
