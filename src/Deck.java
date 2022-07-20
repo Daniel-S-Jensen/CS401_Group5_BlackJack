@@ -3,9 +3,9 @@ import java.util.*;
 public class Deck {
 
 	//attributes
-	static final int maxNumOfCards = 52;	//max number of cards in the deck
-	int numberOfCardsLeft;					//current number of cards in deck
-	Card[] cards;							//deck, array holding the cards
+	private static final int maxNumOfCards = 52;	//max number of cards in the deck
+	private int numberOfCardsLeft;					//current number of cards in deck
+	private Card[] cards;							//deck, array holding the cards
 	
 	//constructor
 	public Deck() {

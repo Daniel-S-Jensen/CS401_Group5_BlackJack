@@ -1,9 +1,9 @@
 public class Card {
 	
 	//attributes
-	int cardValue;					//face value of the card
-	CardSuit cardSuit;				//the suit of the card
-	Boolean isFaceDown = false;		//whether the card is facing up(false) or down(true)
+	private int cardValue;					//face value of the card
+	private CardSuit cardSuit;				//the suit of the card
+	private Boolean isFaceDown = false;		//whether the card is facing up(false) or down(true)
 	
 	//constructor
 	public Card(int cardValue, CardSuit cardSuit) {
@@ -27,7 +27,7 @@ public class Card {
 	}
 	
 	//setter method for isFaceDown
-	private void setIsFacedown(Boolean isFacedown) {
+	public void setIsFacedown(Boolean isFacedown) {
 		this.isFaceDown = isFacedown;
 	}
 	
