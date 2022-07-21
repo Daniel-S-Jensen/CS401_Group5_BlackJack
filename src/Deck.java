@@ -42,7 +42,7 @@ public class Deck {
 				cards[i] = card;
 				continue;
 			}
-			else if (i < 2 * cardsInSuit) {
+			else if (i < 2 * cardsInSuit) {  // i <3 ?
 				Card card = new Card(i % cardsInSuit ,CardSuit.Hearts);
 				cards[i] = card;
 				continue;
