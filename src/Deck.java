@@ -42,7 +42,11 @@ public class Deck {
 				cards[i] = card;
 				continue;
 			}
+<<<<<<< Updated upstream
 			else if (i < 2 * cardsInSuit) {  // i <3 * cardsInSuit ?
+=======
+			else if (i < 3 * cardsInSuit) {
+>>>>>>> Stashed changes
 				Card card = new Card(i % cardsInSuit ,CardSuit.Hearts);
 				cards[i] = card;
 				continue;

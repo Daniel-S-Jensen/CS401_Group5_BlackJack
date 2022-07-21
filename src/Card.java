@@ -12,7 +12,7 @@ public class Card {
 	}
 	
 	//returns the face value of the card
-	public int getValue() {
+	 public int getValue() {
 		return this.cardValue;
 	}
 	
