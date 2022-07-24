@@ -449,7 +449,7 @@ public class Client {
 
 		//send join game message
 		sendMessage(socket, joinGameMessage);
-
+		
 		Boolean messageReceived = false;
 		try {
 			while (!messageReceived) {
@@ -466,6 +466,9 @@ public class Client {
 							while (playAgain) {
 								playAgain = playGame(socket, receivedMessage.getTable());
 							}
+						}
+						else if(receivedMessage.getStatus() == MessageStatus.failure) {
+							System.out.println("Error joining game. Please try agian.");
 						}
 						messageReceived = true;
 					}
@@ -485,31 +488,45 @@ public class Client {
 
 		//send join game message
 		sendMessage(socket, joinGameMessage);
-
-		Boolean messageReceived = false;
-		try {
-			while (!messageReceived) {
-				//receive server response
-				InputStream inputStream = socket.getInputStream();
-				ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
-				List<Message> listOfReceivedMessages = (List<Message>) objectInputStream.readObject();
-				if (listOfReceivedMessages.size() > 0) {
-					Message receivedMessage = listOfReceivedMessages.get(0);
-					if (receivedMessage.getType() == MessageType.joinTable) {
-						if(receivedMessage.getStatus() == MessageStatus.success) {
-							activeUser = receivedMessage.getUser();
-							Boolean playAgain = true;
-							while (playAgain) {
-								playAgain = playGame(socket, receivedMessage.getTable());
+		
+		Boolean gameJoined = false;
+		while (!gameJoined) {
+			Boolean messageReceived = false;
+			try {
+				while (!messageReceived) {
+					//receive server response
+					InputStream inputStream = socket.getInputStream();
+					ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+					List<Message> listOfReceivedMessages = (List<Message>) objectInputStream.readObject();
+					if (listOfReceivedMessages.size() > 0) {
+						Message receivedMessage = listOfReceivedMessages.get(0);
+						if (receivedMessage.getType() == MessageType.joinTable) {
+							if(receivedMessage.getStatus() == MessageStatus.success) {
+								activeUser = receivedMessage.getUser();
+								Boolean playAgain = true;
+								while (playAgain) {
+									playAgain = playGame(socket, receivedMessage.getTable());
+									gameJoined = true;
+								}
 							}
+							else if(receivedMessage.getStatus() == MessageStatus.failure) {
+								if(receivedMessage.getValue() != 2) {
+									int time = receivedMessage.getValue();
+									System.out.println("You are in a queue to join a table. The game will start in " + time + " seconds or when table reaches max players.");
+								}
+								else {
+									System.out.println("Error joining game. Please try agian.");
+									gameJoined = true;	//sends back to menu to retry
+								}
+							}
+							messageReceived = true;
 						}
-						messageReceived = true;
-					}
-				}	
+					}	
+				}
 			}
-		}
-		catch (IOException | ClassNotFoundException e) {
-			e.printStackTrace();
+			catch (IOException | ClassNotFoundException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
