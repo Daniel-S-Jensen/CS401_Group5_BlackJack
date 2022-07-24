@@ -6,5 +6,7 @@ public enum MessageType {
 	update,
 	transaction,
 	response,
-	
+	joinTable,
+	requestGameAction,
+	requestBet,
 }

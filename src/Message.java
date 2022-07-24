@@ -8,6 +8,8 @@ public class Message implements Serializable {
 	protected String username;			//for login
 	protected String password;			//for login
 	protected User user;				//
+	protected Table table;				//for joining games
+	protected Boolean userTurn;
 
 	//constructors
 	public Message(MessageType type) {
@@ -67,6 +69,26 @@ public class Message implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+
+	public Table getTable() {
+		return table;
+	}
+
+
+	public void setTable(Table table) {
+		this.table = table;
+	}
+
+
+	public Boolean getTurn() {
+		return userTurn;
+	}
+
+
+	public void setTurn(Boolean userTurn) {
+		this.userTurn = userTurn;
 	}
 
 	

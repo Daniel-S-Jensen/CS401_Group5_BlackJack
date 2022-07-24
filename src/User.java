@@ -13,13 +13,16 @@ public class User {
 	
 	//default constructor
 	public User() {
-		this.hand = new Hand();
 	}
 	
 	//constructor sets name
 	public User(String name) {
 		this.name = name;
-		this.hand = new Hand();
+	}
+	
+	public User(String name, UserID userID) {
+		this.name = name;
+		this.userID = userID;
 	}
 	
 	//returns if player intends to play next game
@@ -52,15 +55,19 @@ public class User {
 		}
 	}
 	
+	
+	public void hit() {
+		this.isStanding = false;
+	}
+	
 	//
-//	public  hit() {
-//		
-//	}
-//	
-//	//
-//	public  stand() {
-//		
-//	}
+	public void stand() {
+		this.isStanding = true;
+	}
+	
+	public Boolean getIsStanding() {
+		return this.isStanding;
+	}
 	
 	//returns user's name
 	public String getName() {
@@ -74,6 +81,15 @@ public class User {
 	public void setUserType(UserType userType) {
 		this.userType = userType;
 	}
+
+	public UserID getUserID() {
+		return userID;
+	}
+
+	public void setUserID(UserID userID) {
+		this.userID = userID;
+	}
+	
 	
 	
 	

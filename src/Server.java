@@ -4,10 +4,11 @@ import java.util.*;
 
 public class Server {
 	
-	/*
-	//adds new client connection to list of clients
-	clientList.add(client); //do this after joining a table
-	*/
+	private static ArrayList<Dealer> dealerList;
+	private static ArrayList<Player> playerList;
+	private static ArrayList<Login> loginList;
+	
+	Player test = new Player();
 	
 	public static void main(String[] args) throws IOException {
 
@@ -55,6 +56,9 @@ public class Server {
 
 		public void run() throws IndexOutOfBoundsException {
 
+			loadLoginList();
+			loadUserList();
+			
 			try {
 				Boolean closeThread = false;
 				while (!closeThread) {
@@ -64,7 +68,6 @@ public class Server {
 
 						Boolean messageReceived = false;
 						while (!messageReceived) {
-	
 							//client input stream from connected socket
 							InputStream inputStream = clientSocket.getInputStream();
 	
@@ -81,31 +84,76 @@ public class Server {
 									System.out.println("Login attempt received from " + clientSocket);
 									Message message;
 									
-									User loadedUser;
-									//list of logins
-									//TODO: compare login info to list of all users
-									//loop to go through list
-									if (receivedMessage.getUsername().equals("username") && receivedMessage.getPassword().equals("password")) {
-										loginMatches = true;
-										//process message
-										message = receivedMessage;
+									//finds login in list of valid logins
+									User loadedUser = null;
+									Login foundLogin = null;
+									Boolean userFound = false;
+									for (int i = 0; i < loginList.size(); i++) {
+										if (receivedMessage.getUsername().equals(loginList.get(i).getUsername()) && receivedMessage.getPassword().equals(loginList.get(i).getPassword())) {
+											loginMatches = true;
+											userFound = true;
+											foundLogin = loginList.get(i);
+											break;
+										}
+									}
+									//send message back
+									message = receivedMessage;
+									if (userFound) {
+										if (foundLogin.getUserID().getUserType() == UserType.dealer) {
+											for (int i = 0; i < dealerList.size(); i++) {
+												if(dealerList.get(i).getUserID() == foundLogin.getUserID()) {
+													loadedUser = dealerList.get(i);
+													break;
+												}
+											}
+										}
+										else {
+											for (int i = 0; i < playerList.size(); i++) {
+												if(playerList.get(i).getUserID() == foundLogin.getUserID()) {
+													loadedUser = playerList.get(i);
+													break;
+												}
+											}
+										}
+										
 										message.setStatus(MessageStatus.success);
+										message.setUser(loadedUser);
 										System.out.println("Login attempt :" + "success");
-										//send message back
-										sendMessage(clientSocket, message);
 									}
 									else {
-										//send message back
-										message = new Message(receivedMessage.getType(), "fail", receivedMessage.getText());
-										System.out.println("Login attempt: " + message.getStatus());
-										sendMessage(clientSocket, message);
+										message.setStatus(MessageStatus.failure);
+										System.out.println("Login attempt :" + "failure");
 									}
 									
-									
+									sendMessage(clientSocket, message);
+								}
+								else if (receivedMessage.getType() == MessageType.signup) {
+									Boolean validUsername = true;
+									Message message = receivedMessage;
+									for (int i = 0; i < loginList.size(); i++) {
+										if(loginList.get(i).getUsername() == receivedMessage.getUsername()) {
+											validUsername = false;
+											message.setStatus(MessageStatus.failure);
+											break;
+										}
+									}
+									if (validUsername) {
+										loginMatches = true;
+										Login login = new Login(receivedMessage.getUsername(), receivedMessage.getPassword(), UserIDType.P);
+										loginList.add(login);
+										Player player = new Player(receivedMessage.getName(), login.getUserID());
+										playerList.add(player);
+										message.setUser(player);
+										message.setStatus(MessageStatus.success);
+										
+									}
+									sendMessage(clientSocket, message);
 								}
 							}
 						}
 					}
+					
+					//if (receivedMessage.getType() == MessageType.logout)
 					Boolean logoutReceived = false;
 					while (!logoutReceived) {
 
@@ -116,29 +164,32 @@ public class Server {
 						ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
 
 						List<Message> listOfMessages = (List<Message>) objectInputStream.readObject();
-						Message message = listOfMessages.get(0);
-						logoutReceived = checkLogout(message);
-						if (!logoutReceived) {
-							//System.out.println("Received [" + listOfMessages.size() + "] message from: " + clientSocket);
-							System.out.println("Received message from: " + clientSocket);					
-							//System.out.println("All messages:");
-							//listOfMessages.forEach(msg -> printMessage(msg));
-							printMessage(message);
-
-							//process message
-							//listOfMessages.forEach(msg -> processMessage(msg));
-							Message returnMessage = processMessage(message);
-							sendMessage(clientSocket, returnMessage);
-							updateClients(clientSocket, returnMessage);
-
-						}
-						if (logoutReceived) {
+						Message receivedMessage = listOfMessages.get(0);
+						if (receivedMessage.getType() == MessageType.logout) {
+							logoutReceived = true;
 							System.out.println("Logout received from " + clientSocket);
-							//process message
-							Message returnMessage = processMessage(message);
+							Message message = receivedMessage;
+							message.setStatus(MessageStatus.success);
 							//send message back
-							sendMessage(clientSocket, returnMessage);
+							sendMessage(clientSocket, message);
 							closeThread = true;
+						}
+						else if (receivedMessage.getType() == MessageType.transaction) {
+							System.out.println("Balance update received from " + clientSocket);
+							Message message = receivedMessage;
+							for (int i = 0; i < playerList.size(); i++) {
+								if(playerList.get(i).getUserID() == receivedMessage.getUser().getUserID()) {
+									playerList.get(i).receivePayout(receivedMessage.value);
+									break;
+								}
+							}
+							message.setStatus(MessageStatus.success);
+							//send message back
+							sendMessage(clientSocket, message);
+							closeThread = true;					
+						}
+						else {
+							//TODO: non logout/login messages
 						}
 					}					
 				}	
@@ -161,38 +212,6 @@ public class Server {
 			}
 		}
 
-		private static void printMessage(Message msg){
-			System.out.println("Type: " + msg.getType());
-			System.out.println("Status: " + msg.getStatus());
-			System.out.println("Text: " + msg.getText());
-		}
-
-		private Message processMessage (Message message) {
-			if (message.getType().equals("login")) {
-				message.setStatus("success");
-			}
-			else if (message.getType().equals("logout")) {
-				message.setStatus("success");
-			}
-			else if (message.getType().equals("text")) {
-				message.setText(message.getText().toUpperCase());
-			}
-			return message;
-		}
-
-//		private Boolean checkLogin(Message msg){
-//			if (msg.getType().equals("login")) {
-//				return true;
-//			}
-//			return false;
-//		}
-//
-//		private Boolean checkLogout(Message msg){
-//			if (msg.getType().equals("logout")) {
-//				return true;
-//			}
-//			return false;
-//		}
 
 		private static void sendMessage(Socket socket, Message message) {
 			try {
@@ -207,27 +226,76 @@ public class Server {
 			}
 		}
 		
-		private static void updateClients(Socket socket, Message message) {
+		
+
+		private void loadLoginList() {
+			String filename = "loginList.txt";
 			try {
-				for (int i=0; i < clientList.size(); i++) {
-					if (clientList.get(i) == socket) {
-						continue;
+				File inFile = new File(filename);
+				Scanner input = new Scanner(inFile);
+				while (input.hasNextLine()) {
+					String inLine = input.nextLine();
+					String[] tokens = inLine.split(",");
+					if(tokens.length == 3) {
+						UserID tempUserID = new UserID(tokens[2].charAt(0), Integer.valueOf(tokens[2].substring(1)));
+						Login tempLogin = new Login(tokens[0], tokens[1], tempUserID);
+						loginList.add(tempLogin);
 					}
 					else {
-						List<Message> messages = new ArrayList<>();
-						OutputStream outputStream = clientList.get(i).getOutputStream();
-						ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
-						messages.add(message);
-						objectOutputStream.writeObject(messages);
+						break;
 					}
 				}
-			}
-			catch (IOException e) {
-				e.printStackTrace();
+				UserID temp = new UserID();
+				temp.loadCount(loginList.size());
+				input.close();
+				
+			} catch (FileNotFoundException e) {
+				//e.printStackTrace();
 			}
 		}
+		
+		private static void loadUserList() {
+			String filename = "userList.txt";
+			try {
+				File inFile = new File(filename);
+				Scanner input = new Scanner(inFile);
+				while (input.hasNextLine()) {
+					String inLine = input.nextLine();
+					String[] tokens = inLine.split(",");
+					//TODO: update tokens number
+					if(tokens.length == 3) {
+						UserID tempUserID = new UserID(tokens[0].charAt(0), Integer.valueOf(tokens[0].substring(1)));
+						if (tempUserID.getUserType() == UserType.dealer) {
+							Dealer tempDealer = new Dealer(tempUserID);
+							dealerList.add(tempDealer);
+						}
+						else {
+							Player tempPlayer = new Player(tokens[0], tokens[1], tempUserID);
+							playerList.add(tempPlayer);
+						}
+						
+					}
+					else {
+						break;
+					}
+				}
+				UserID temp = new UserID();
+				temp.loadCount(loginList.size());
+				input.close();
+				
+			} catch (FileNotFoundException e) {
+				//e.printStackTrace();
+			}
+		}
+		
+		//TODO: save functions
+		private static void saveLoginList() {
+			
+		}
 
-
+		private static void saveUserList() {
+			
+		}
 	}
 
 

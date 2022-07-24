@@ -7,7 +7,7 @@ public class Player extends User {
 	
 	//constructor
 	public Player() {
-		this.userType = userType.player;
+		this.userType = UserType.player;
 		this.accountBalance = 0;
 	}
 	

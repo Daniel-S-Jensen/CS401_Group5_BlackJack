@@ -1,5 +1,9 @@
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Table {
 	
@@ -13,8 +17,6 @@ public class Table {
 	private Player[] players;
 	
 	private ArrayList<Socket> clientList;
-	
-	
 	
 	//constructor
 	public Table() {
@@ -30,6 +32,39 @@ public class Table {
 		this.players[this.playerCount] = player;
 		playerCount++;
 		this.clientList.add(socket);
+	}
+	
+	//adds a player to this table
+	public void addDealer(Dealer dealer, Socket socket) {
+		this.dealer = dealer;
+		dealerAssigned = true;
+		this.clientList.add(socket);
+	}
+	
+	private void updateClients(Socket socket, Message message) {
+		try {
+			for (int i=0; i < this.clientList.size(); i++) {
+				if (this.clientList.get(i) == socket) {
+					continue;
+				}
+				else {
+					List<Message> messages = new ArrayList<>();
+					OutputStream outputStream = this.clientList.get(i).getOutputStream();
+					ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+					messages.add(message);
+					objectOutputStream.writeObject(messages);
+				}
+			}
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public String toString() {
+		String tableString = "";
+		
+		return tableString;
 	}
 	
 }

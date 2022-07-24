@@ -6,7 +6,7 @@ public class Dealer extends User {
 	
 	//constructor
 	public Dealer() {
-		this.userType = userType.dealer;
+		this.userType = UserType.dealer;
 	}
 	
 	//
