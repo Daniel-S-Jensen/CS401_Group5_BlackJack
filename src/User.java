@@ -2,25 +2,24 @@
 public class User {
 	
 	//attributes
-	private String name;
-	private Hand hand;
-	//private Boolean isStillInGame = true;
-	//private Boolean isStanding = false;
+	protected String name;
+	protected Hand hand;
+	protected UserID userID;
+	protected UserType userType;
+	protected Boolean isStillInGame = true;
+	protected Boolean isStanding = false;
+	protected Boolean isTurn = false;
 	
 	
 	//default constructor
 	public User() {
 		this.hand = new Hand();
-		this.isStillInGame = true;
-		this.isStanding = false;
 	}
 	
 	//constructor sets name
 	public User(String name) {
 		this.name = name;
 		this.hand = new Hand();
-		this.isStillInGame = true;
-		this.isStanding = false;
 	}
 	
 	//returns if player intends to play next game
@@ -29,9 +28,9 @@ public class User {
 	}
 	
 	//
-	public getCards() {
-		
-	}
+//	public getCards() {
+//		
+//	}
 	
 	//checks if user has a blackjack or not
 	public Boolean checkBlackJack() {
@@ -54,17 +53,29 @@ public class User {
 	}
 	
 	//
-	public  hit() {
-		
-	}
-	
-	//
-	public  stand() {
-		
-	}
+//	public  hit() {
+//		
+//	}
+//	
+//	//
+//	public  stand() {
+//		
+//	}
 	
 	//returns user's name
 	public String getName() {
 		return this.name;
 	}
+
+	public UserType getUserType() {
+		return userType;
+	}
+
+	public void setUserType(UserType userType) {
+		this.userType = userType;
+	}
+	
+	
+	
+	
 }

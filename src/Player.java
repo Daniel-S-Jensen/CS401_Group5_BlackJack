@@ -7,7 +7,8 @@ public class Player extends User {
 	
 	//constructor
 	public Player() {
-		
+		this.userType = userType.player;
+		this.accountBalance = 0;
 	}
 	
 	//returns how much the player bet this round
@@ -18,20 +19,23 @@ public class Player extends User {
 	//sets how much the player bet this round
 	public void setBet(int bet) {
 		this.betAmount = bet;
+		this.accountBalance -= bet;
 	}
 	
 	//
-	public  playerPayoutForThisGame() {
-		
+	public void receivePayout(int payout) {
+		this.accountBalance += payout;
 	}
-	/**
-		public int getAccountBalance() {
+	
+	//
+	public int getAccountBalance() {
 		return accountBalance;
 	}
 
+	//
 	public void setAccountBalance(int accountBalance) {
 		this.accountBalance = accountBalance;
 	}
-	*/
+	
 	
 }

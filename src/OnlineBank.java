@@ -42,7 +42,7 @@ public class OnlineBank extends Player {
 	public void addCash() {
 		
 		System.out.println("Enter the amount(interger) that you want to add ?");
-		int amount = scan.nextInt();
+		int amount = scan.
 		setAccountBalance(getAccountBalance() + amount);
 		System.out.println("Added succussfully, the current balance is $" + getAccountBalance());
 	}

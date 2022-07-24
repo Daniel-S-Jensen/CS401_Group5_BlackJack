@@ -6,11 +6,11 @@ public class Dealer extends User {
 	
 	//constructor
 	public Dealer() {
-		
+		this.userType = userType.dealer;
 	}
 	
 	//
-	public  getFaceDownCard() {
+	/*public  getFaceDownCard() {
 		
 	}
 	
@@ -22,7 +22,7 @@ public class Dealer extends User {
 	//
 	public  payPlayerPayout(User user) {
 		
-	}
+	}*/
 	
 	
 }
