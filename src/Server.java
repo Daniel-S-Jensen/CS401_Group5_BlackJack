@@ -192,7 +192,19 @@ public class Server {
 							closeThread = true;					
 						}
 						else {
-							//TODO: non logout/login messages
+							//TODO: gameplay
+							Message message = receivedMessage;
+							for (int i = 0; i < playerList.size(); i++) {
+								if(playerList.get(i).getUserID() == receivedMessage.getUser().getUserID()) {
+									playerList.get(i).receivePayout(receivedMessage.value);
+									saveUserList();
+									break;
+								}
+							}
+							message.setStatus(MessageStatus.success);
+							//send message back
+							sendMessage(clientSocket, message);
+							closeThread = true;	
 						}
 					}					
 				}	

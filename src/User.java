@@ -30,10 +30,10 @@ public class User {
 		return this.isStillInGame;
 	}
 	
-	//
-//	public getCards() {
-//		
-//	}
+	
+	public Hand getHand() {
+		return this.hand;
+	}
 	
 	//checks if user has a blackjack or not
 	public Boolean checkBlackJack() {
@@ -54,7 +54,6 @@ public class User {
 			return false;
 		}
 	}
-	
 	
 	public void hit() {
 		this.isStanding = false;
