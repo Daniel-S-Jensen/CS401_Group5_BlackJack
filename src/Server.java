@@ -3,13 +3,13 @@ import java.net.*;
 import java.util.*;
 
 public class Server {
-	
+
 	private static ArrayList<Dealer> dealerList;
 	private static ArrayList<Player> playerList;
 	private static ArrayList<Login> loginList;
-	
+
 	Player test = new Player();
-	
+
 	public static void main(String[] args) throws IOException {
 
 		ServerSocket server = null;
@@ -23,7 +23,7 @@ public class Server {
 			while(true) {
 				//socket to receive requests on
 				Socket client = server.accept();
-				
+
 				System.out.println("Connection from " + client); //
 
 				//new thread
@@ -58,7 +58,7 @@ public class Server {
 
 			loadLoginList();
 			loadUserList();
-			
+
 			try {
 				Boolean closeThread = false;
 				while (!closeThread) {
@@ -70,20 +70,20 @@ public class Server {
 						while (!messageReceived) {
 							//client input stream from connected socket
 							InputStream inputStream = clientSocket.getInputStream();
-	
+
 							//object input stream
 							ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
-	
+
 							List<Message> listOfMessages = (List<Message>) objectInputStream.readObject();
-	
+
 							if (listOfMessages.size() > 0) {
 								Message receivedMessage = listOfMessages.get(0);
-	
+
 								if (receivedMessage.getType() == MessageType.login) {
 									messageReceived = true;
 									System.out.println("Login attempt received from " + clientSocket);
 									Message message;
-									
+
 									//finds login in list of valid logins
 									User loadedUser = null;
 									Login foundLogin = null;
@@ -115,7 +115,7 @@ public class Server {
 												}
 											}
 										}
-										
+
 										message.setStatus(MessageStatus.success);
 										message.setUser(loadedUser);
 										System.out.println("Login attempt :" + "success");
@@ -124,7 +124,7 @@ public class Server {
 										message.setStatus(MessageStatus.failure);
 										System.out.println("Login attempt :" + "failure");
 									}
-									
+
 									sendMessage(clientSocket, message);
 								}
 								else if (receivedMessage.getType() == MessageType.signup) {
@@ -141,18 +141,20 @@ public class Server {
 										loginMatches = true;
 										Login login = new Login(receivedMessage.getUsername(), receivedMessage.getPassword(), UserIDType.P);
 										loginList.add(login);
+										saveLoginList();
 										Player player = new Player(receivedMessage.getName(), login.getUserID());
 										playerList.add(player);
+										saveUserList();
 										message.setUser(player);
 										message.setStatus(MessageStatus.success);
-										
+
 									}
 									sendMessage(clientSocket, message);
 								}
 							}
 						}
 					}
-					
+
 					//if (receivedMessage.getType() == MessageType.logout)
 					Boolean logoutReceived = false;
 					while (!logoutReceived) {
@@ -180,6 +182,7 @@ public class Server {
 							for (int i = 0; i < playerList.size(); i++) {
 								if(playerList.get(i).getUserID() == receivedMessage.getUser().getUserID()) {
 									playerList.get(i).receivePayout(receivedMessage.value);
+									saveUserList();
 									break;
 								}
 							}
@@ -193,7 +196,6 @@ public class Server {
 						}
 					}					
 				}	
-
 			}
 			catch (IOException | ClassNotFoundException e) {
 				e.printStackTrace();
@@ -207,8 +209,6 @@ public class Server {
 				catch (IOException e) {
 					e.printStackTrace();
 				}
-
-
 			}
 		}
 
@@ -225,8 +225,8 @@ public class Server {
 				e.printStackTrace();
 			}
 		}
-		
-		
+
+
 
 		private void loadLoginList() {
 			String filename = "loginList.txt";
@@ -248,12 +248,13 @@ public class Server {
 				UserID temp = new UserID();
 				temp.loadCount(loginList.size());
 				input.close();
-				
-			} catch (FileNotFoundException e) {
+
+			}
+			catch (FileNotFoundException e) {
 				//e.printStackTrace();
 			}
 		}
-		
+
 		private static void loadUserList() {
 			String filename = "userList.txt";
 			try {
@@ -262,18 +263,17 @@ public class Server {
 				while (input.hasNextLine()) {
 					String inLine = input.nextLine();
 					String[] tokens = inLine.split(",");
-					//TODO: update tokens number
 					if(tokens.length == 3) {
 						UserID tempUserID = new UserID(tokens[0].charAt(0), Integer.valueOf(tokens[0].substring(1)));
 						if (tempUserID.getUserType() == UserType.dealer) {
-							Dealer tempDealer = new Dealer(tempUserID);
+							Dealer tempDealer = new Dealer(tempUserID, tokens[1]);
 							dealerList.add(tempDealer);
 						}
 						else {
-							Player tempPlayer = new Player(tokens[0], tokens[1], tempUserID);
+							Player tempPlayer = new Player(tempUserID, tokens[1], Integer.valueOf(tokens[2]));
 							playerList.add(tempPlayer);
 						}
-						
+
 					}
 					else {
 						break;
@@ -282,19 +282,41 @@ public class Server {
 				UserID temp = new UserID();
 				temp.loadCount(loginList.size());
 				input.close();
-				
+
 			} catch (FileNotFoundException e) {
 				//e.printStackTrace();
 			}
 		}
-		
-		//TODO: save functions
+
 		private static void saveLoginList() {
-			
+			try {
+				String filename = "loginList.txt";
+				FileWriter outFile = new FileWriter(filename);
+				for (int i = 0; i < loginList.size(); i++) {
+					outFile.write(loginList.get(i).toString());
+				}
+				outFile.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+
+			}
 		}
 
 		private static void saveUserList() {
-			
+			try {
+				String filename = "userList.txt";
+				FileWriter outFile = new FileWriter(filename);
+				for (int i = 0; i < dealerList.size(); i++) {
+					outFile.write(dealerList.get(i).toString());
+				}
+				for (int i = 0; i < playerList.size(); i++) {
+					outFile.write(playerList.get(i).toString());
+				}
+				outFile.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+
+			}
 		}
 	}
 

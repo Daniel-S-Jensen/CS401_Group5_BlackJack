@@ -11,6 +11,17 @@ public class Player extends User {
 		this.accountBalance = 0;
 	}
 	
+	public Player(String name, UserID userID) {
+		this.name = name;
+		this.userID = userID;
+	}
+	
+	public Player(UserID userID, String name, int accountBalance) {
+		this.userID = userID;
+		this.name = name;
+		this.accountBalance = accountBalance;
+	}
+	
 	//returns how much the player bet this round
 	public int getBet() {
 		return this.betAmount;
@@ -35,6 +46,10 @@ public class Player extends User {
 	//
 	public void setAccountBalance(int accountBalance) {
 		this.accountBalance = accountBalance;
+	}
+	
+	public String toString() {
+		return (this.userID.toString() + ", " + this.name + ", " + this.accountBalance);
 	}
 	
 	

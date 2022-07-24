@@ -404,7 +404,39 @@ public class Client {
 	private static Boolean dealerGame(Socket socket) {
 		Boolean inGame = true;
 		while(inGame) {
-
+			//create message
+			Message joinGameMessage = new Message(MessageType.joinTable);
+			joinGameMessage.setUser(activeUser);
+			
+			Boolean messageReceived = false;
+			try {
+				while (!messageReceived) {
+					//receive server response
+					InputStream inputStream = socket.getInputStream();
+					ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+					List<Message> listOfReceivedMessages = (List<Message>) objectInputStream.readObject();
+					if (listOfReceivedMessages.size() > 0) {
+						Message receivedMessage = listOfReceivedMessages.get(0);
+						if (receivedMessage.getType() == MessageType.joinTable) {
+							if(receivedMessage.getStatus() == MessageStatus.success) {
+								activeUser = receivedMessage.getUser();
+								Boolean dealAgain = true;
+								while (dealAgain) {
+									dealAgain = dealGame(socket, receivedMessage.getTable());
+								}
+							}
+							else if(receivedMessage.getStatus() == MessageStatus.failure) {
+								System.out.println("Error joining game. Please try again.");
+							}
+							inGame = false;
+							messageReceived = true;
+						}
+					}	
+				}
+			}
+			catch (IOException | ClassNotFoundException e) {
+				e.printStackTrace();
+			}
 		}
 		return inGame;
 	}
@@ -468,7 +500,7 @@ public class Client {
 							}
 						}
 						else if(receivedMessage.getStatus() == MessageStatus.failure) {
-							System.out.println("Error joining game. Please try agian.");
+							System.out.println("Error joining game. Please try again.");
 						}
 						messageReceived = true;
 					}
@@ -515,7 +547,7 @@ public class Client {
 									System.out.println("You are in a queue to join a table. The game will start in " + time + " seconds or when table reaches max players.");
 								}
 								else {
-									System.out.println("Error joining game. Please try agian.");
+									System.out.println("Error joining game. Please try again.");
 									gameJoined = true;	//sends back to menu to retry
 								}
 							}
@@ -576,6 +608,62 @@ public class Client {
 										}
 									}
 									message.setUser(activeUser);
+								}
+							}
+							sendMessage(socket, message);
+						}
+						else if (receivedMessage.getType() == MessageType.update) {
+							//TODO: update game to show current cards or end game
+							//update game display
+							
+							//dispay winning/losing
+						}
+					}	
+					messageReceived = true;
+				}
+			}
+			catch (IOException | ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+		Boolean menuChoiceSelected = false;
+		while (!menuChoiceSelected) {
+			System.out.println("Would you like to play again:");
+			System.out.println("1. Yes");
+			System.out.println("2. No");
+			char menuChoice = sc.nextLine().charAt(0);
+			if (menuChoice == '1') {
+				playAgain = true;
+				menuChoiceSelected = true;
+			}
+			else if (menuChoice == '2') {
+				playAgain = false;
+				menuChoiceSelected = true;
+			}
+		}
+		return playAgain;
+	}
+	
+	//TODO:all dealer interaction
+	private static Boolean dealGame(Socket socket, Table table) {
+		Boolean playAgain = false;
+		Scanner sc = new Scanner(System.in);
+		Boolean gameOver = false;
+		while (!gameOver) {
+			try {
+				Boolean messageReceived = false;
+				while (!messageReceived) {
+					//receive server response
+					InputStream inputStream = socket.getInputStream();
+					ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+					List<Message> listOfReceivedMessages = (List<Message>) objectInputStream.readObject();
+					if (listOfReceivedMessages.size() > 0) {
+						Message receivedMessage = listOfReceivedMessages.get(0);
+						//users turn
+						if(receivedMessage.getUser() == activeUser) {
+							Message message = receivedMessage;
+							if(receivedMessage.getTurn() == true) {
+								if (receivedMessage.getType() == MessageType.requestGameAction) {
 								}
 							}
 							sendMessage(socket, message);
