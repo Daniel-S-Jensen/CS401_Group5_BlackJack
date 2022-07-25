@@ -354,10 +354,10 @@ public class Server {
 				String filename = "userList.txt";
 				FileWriter outFile = new FileWriter(filename);
 				for (int i = 0; i < dealerList.size(); i++) {
-					outFile.write(dealerList.get(i).toString());
+					outFile.write(dealerList.get(i).toString() + "\n");
 				}
 				for (int i = 0; i < playerList.size(); i++) {
-					outFile.write(playerList.get(i).toString());
+					outFile.write(playerList.get(i).toString() + "\n");
 				}
 				outFile.close();
 			} catch (IOException e) {
