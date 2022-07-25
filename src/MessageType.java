@@ -7,6 +7,12 @@ public enum MessageType {
 	transaction,
 	response,
 	joinTable,
+	startGame,
 	requestGameAction,
 	requestBet,
+	dealRequest,
+	hitRequest,
+	betRequest,
+	endGame,
+	payoutRequest,
 }

@@ -15,6 +15,7 @@ public class Table {
 	private Dealer dealer;
 	private int playerCount;
 	private Player[] players;
+	private Boolean full;
 	
 	private ArrayList<Socket> clientList;
 	
@@ -25,18 +26,22 @@ public class Table {
 		this.players = new Player[Max_Players];
 		this.playerCount = 0;
 		this.clientList = new ArrayList<Socket>();
+		this.full = false;
 	}
 	
 	//adds a player to this table
-	public void addPlayer(Player player, Socket socket) {
-		this.players[this.playerCount] = player;
-		playerCount++;
+	public void addPlayer(User user, Socket socket) {
+		this.players[this.playerCount] = (Player) user;
+		this.playerCount++;
 		this.clientList.add(socket);
+		if(this.playerCount == Max_Players) {
+			this.full = true;
+		}
 	}
 	
 	//adds a player to this table
-	public void addDealer(Dealer dealer, Socket socket) {
-		this.dealer = dealer;
+	public void addDealer(User user, Socket socket) {
+		this.dealer = (Dealer) user;
 		dealerAssigned = true;
 		this.clientList.add(socket);
 	}
@@ -66,5 +71,18 @@ public class Table {
 		
 		return tableString;
 	}
+
+	public int getPlayerCount() {
+		return playerCount;
+	}
+
+	public Boolean getFull() {
+		return full;
+	}
+
+	public void setFull(Boolean full) {
+		this.full = full;
+	}
+	
 	
 }

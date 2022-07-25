@@ -7,6 +7,8 @@ public class Server {
 	private static ArrayList<Dealer> dealerList;
 	private static ArrayList<Player> playerList;
 	private static ArrayList<Login> loginList;
+	
+	private static ArrayList<Table> tableList;
 
 	Player test = new Player();
 
@@ -155,7 +157,6 @@ public class Server {
 						}
 					}
 
-					//if (receivedMessage.getType() == MessageType.logout)
 					Boolean logoutReceived = false;
 					while (!logoutReceived) {
 
@@ -188,19 +189,53 @@ public class Server {
 							}
 							message.setStatus(MessageStatus.success);
 							//send message back
-							sendMessage(clientSocket, message);
-							closeThread = true;					
+							sendMessage(clientSocket, message);				
 						}
 						else {
 							//TODO: gameplay
 							Message message = receivedMessage;
-							for (int i = 0; i < playerList.size(); i++) {
-								if(playerList.get(i).getUserID() == receivedMessage.getUser().getUserID()) {
-									playerList.get(i).receivePayout(receivedMessage.value);
-									saveUserList();
-									break;
+							if (receivedMessage.getUser().getUserType() == UserType.player) {
+								if(receivedMessage.getType() == MessageType.joinTable) {
+									//single player
+									if(receivedMessage.getValue() == 1) {
+										for(int i = 0; i < tableList.size(); i++) {
+											if(tableList.get(i).getPlayerCount() == 0) {
+												tableList.get(i).addPlayer(receivedMessage.getUser(), clientSocket);
+												tableList.get(i).setFull(true);
+												message.setStatus(MessageStatus.success);
+												message.setTable(tableList.get(i));
+												break;
+											}
+										}
+									}
+									//multi player
+									else {
+										for(int i = 0; i < tableList.size(); i++) {
+											if(tableList.get(i).getFull() != true) {
+												tableList.get(i).addPlayer(receivedMessage.getUser(), clientSocket);
+												message.setStatus(MessageStatus.failure);
+												message.setTable(tableList.get(i));
+												break;
+											}
+										}
+									}
 								}
 							}
+							else if (receivedMessage.getUser().getUserType() == UserType.dealer) {
+								if(receivedMessage.getType() == MessageType.joinTable) {
+									Table table = new Table();
+									table.addDealer(receivedMessage.getUser(), clientSocket);
+									message.setTable(table);
+									message.setStatus(MessageStatus.success);
+								}
+								else if(receivedMessage.getType() == MessageType.startGame) {
+									receivedMessage.getTable().setFull(true);
+								}
+								
+							}
+							
+							
+							
 							message.setStatus(MessageStatus.success);
 							//send message back
 							sendMessage(clientSocket, message);
@@ -263,7 +298,7 @@ public class Server {
 
 			}
 			catch (FileNotFoundException e) {
-				//e.printStackTrace();
+				e.printStackTrace();
 			}
 		}
 
@@ -331,8 +366,6 @@ public class Server {
 			}
 		}
 	}
-
-
 
 
 }

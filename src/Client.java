@@ -644,7 +644,6 @@ public class Client {
 		return playAgain;
 	}
 	
-	//TODO:all dealer interaction
 	private static Boolean dealGame(Socket socket, Table table) {
 		Boolean playAgain = false;
 		Scanner sc = new Scanner(System.in);
@@ -664,7 +663,46 @@ public class Client {
 							Message message = receivedMessage;
 							if(receivedMessage.getTurn() == true) {
 								if (receivedMessage.getType() == MessageType.requestGameAction) {
+									Boolean menuChoiceSelected = false;
+									while (!menuChoiceSelected) {
+										System.out.println("Would you like to 1. Hit or 2. Stand? <1/2>: ");
+										char menuChoice = sc.nextLine().charAt(0);
+										if (menuChoice == '1') {
+											activePlayer.hit();
+											menuChoiceSelected = true;
+										}
+										else if (menuChoice == '2') {
+											activePlayer.stand();
+											menuChoiceSelected = true;
+										}
+									}
 								}
+								else if (receivedMessage.getType() == MessageType.hitRequest) {
+									System.out.println(receivedMessage.name +" has requested to hit. Press enter to hit player.");
+									sc.nextLine();
+									message.setStatus(MessageStatus.success);
+								}
+								else if (receivedMessage.getType() == MessageType.dealRequest) {
+									System.out.println("Game is starting. Press enter to deal cards.");
+									sc.nextLine();
+									message.setStatus(MessageStatus.success);
+								}
+								else if (receivedMessage.getType() == MessageType.betRequest) {
+									System.out.println(receivedMessage.name +" has requested to bet $" + receivedMessage.getValue() + ". Press enter to confirm.");
+									sc.nextLine();
+									message.setStatus(MessageStatus.success);
+								}
+								else if (receivedMessage.getType() == MessageType.endGame) {
+									System.out.println("All hands are standing or have busted. Press enter to move to payout phase.");
+									sc.nextLine();
+									message.setStatus(MessageStatus.success);
+								}
+								else if (receivedMessage.getType() == MessageType.payoutRequest) {
+									System.out.println(receivedMessage.name +" will be receive $" + receivedMessage.getValue() + ". Press enter to confirm.");
+									sc.nextLine();
+									message.setStatus(MessageStatus.success);
+								}
+								
 							}
 							sendMessage(socket, message);
 						}
