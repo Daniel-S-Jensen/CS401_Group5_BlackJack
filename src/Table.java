@@ -14,10 +14,11 @@ public class Table {
 	private Boolean dealerAssigned;
 	private Dealer dealer;
 	private int playerCount;
-	private Player[] players;
+	public Player[] players;
 	private Boolean full;
+	public long joinTime;
 	
-	private ArrayList<Socket> clientList;
+	public ArrayList<Socket> clientList;
 	
 	//constructor
 	public Table() {
@@ -82,6 +83,10 @@ public class Table {
 
 	public void setFull(Boolean full) {
 		this.full = full;
+	}
+	
+	public Dealer getDealer() {
+		return this.dealer;
 	}
 	
 	

@@ -302,7 +302,6 @@ public class Client {
 				}
 			}
 			while (amount != 0) {
-				//TODO: payment screen would normally go here to complete money transaction
 
 				//create update message
 				Message balanceUpdateMessage = new Message(MessageType.transaction);
@@ -613,10 +612,15 @@ public class Client {
 							sendMessage(socket, message);
 						}
 						else if (receivedMessage.getType() == MessageType.update) {
-							//TODO: update game to show current cards or end game
 							//update game display
-							
-							//dispay winning/losing
+							for (int i = 0; i <= receivedMessage.getTable().getPlayerCount(); i++) {
+								if (i == 0) {
+									System.out.println(receivedMessage.getTable().getDealer().getName() + " has: " + receivedMessage.getTable().getDealer().getHand().toString());
+								}
+								else {
+									System.out.println(receivedMessage.getTable().players[i-1].getName() + " has: " + receivedMessage.getTable().getDealer().getHand().toString());
+								}
+							}
 						}
 					}	
 					messageReceived = true;
@@ -707,10 +711,15 @@ public class Client {
 							sendMessage(socket, message);
 						}
 						else if (receivedMessage.getType() == MessageType.update) {
-							//TODO: update game to show current cards or end game
 							//update game display
-							
-							//dispay winning/losing
+							for (int i = 0; i <= receivedMessage.getTable().getPlayerCount(); i++) {
+								if (i == 0) {
+									System.out.println(receivedMessage.getTable().getDealer().getName() + " has: " + receivedMessage.getTable().getDealer().getHand().toString());
+								}
+								else {
+									System.out.println(receivedMessage.getTable().players[i-1].getName() + " has: " + receivedMessage.getTable().getDealer().getHand().toString());
+								}
+							}
 						}
 					}	
 					messageReceived = true;

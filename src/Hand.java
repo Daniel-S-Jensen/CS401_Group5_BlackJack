@@ -31,4 +31,16 @@ public class Hand {
 		this.handTotal += card.getValue();
 	}
 	
+	//converts hand to string
+	public String toString() {
+		String string = "";
+		for (int i = 0; i < numCardsInHand; i++) {
+			string += hand[i].toString();
+			if (i != numCardsInHand-1) {
+				string += ", ";
+			}
+		}
+		return (string);
+	}
+	
 }

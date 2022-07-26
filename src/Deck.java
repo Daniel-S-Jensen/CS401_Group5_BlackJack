@@ -34,7 +34,7 @@ public class Deck {
 		for (int i = 0; i < maxNumOfCards; i++) {
 			int cardsInSuit = maxNumOfCards/4;
 			if (i < cardsInSuit) {
-				Card card = new Card(i % cardsInSuit ,CardSuit.Clubs);
+				Card card = new Card(i % cardsInSuit, CardSuit.Clubs);
 				cards[i] = card;
 			}
 			else if (i < 2 * cardsInSuit) {

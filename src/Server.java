@@ -167,81 +167,97 @@ public class Server {
 						ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
 
 						List<Message> listOfMessages = (List<Message>) objectInputStream.readObject();
-						Message receivedMessage = listOfMessages.get(0);
-						if (receivedMessage.getType() == MessageType.logout) {
-							logoutReceived = true;
-							System.out.println("Logout received from " + clientSocket);
-							Message message = receivedMessage;
-							message.setStatus(MessageStatus.success);
-							//send message back
-							sendMessage(clientSocket, message);
-							closeThread = true;
-						}
-						else if (receivedMessage.getType() == MessageType.transaction) {
-							System.out.println("Balance update received from " + clientSocket);
-							Message message = receivedMessage;
-							for (int i = 0; i < playerList.size(); i++) {
-								if(playerList.get(i).getUserID() == receivedMessage.getUser().getUserID()) {
-									playerList.get(i).receivePayout(receivedMessage.value);
-									saveUserList();
-									break;
-								}
+						if (listOfMessages.size() > 0) {
+							
+							Message receivedMessage = listOfMessages.get(0);
+							if (receivedMessage.getType() == MessageType.logout) {
+								logoutReceived = true;
+								System.out.println("Logout received from " + clientSocket);
+								Message message = receivedMessage;
+								message.setStatus(MessageStatus.success);
+								//send message back
+								sendMessage(clientSocket, message);
+								closeThread = true;
 							}
-							message.setStatus(MessageStatus.success);
-							//send message back
-							sendMessage(clientSocket, message);				
-						}
-						else {
-							//TODO: gameplay
-							Message message = receivedMessage;
-							if (receivedMessage.getUser().getUserType() == UserType.player) {
-								if(receivedMessage.getType() == MessageType.joinTable) {
-									//single player
-									if(receivedMessage.getValue() == 1) {
-										for(int i = 0; i < tableList.size(); i++) {
-											if(tableList.get(i).getPlayerCount() == 0) {
-												tableList.get(i).addPlayer(receivedMessage.getUser(), clientSocket);
-												tableList.get(i).setFull(true);
-												message.setStatus(MessageStatus.success);
-												message.setTable(tableList.get(i));
-												break;
+							else if (receivedMessage.getType() == MessageType.transaction) {
+								System.out.println("Balance update received from " + clientSocket);
+								Message message = receivedMessage;
+								for (int i = 0; i < playerList.size(); i++) {
+									if(playerList.get(i).getUserID() == receivedMessage.getUser().getUserID()) {
+										playerList.get(i).receivePayout(receivedMessage.value);
+										saveUserList();
+										break;
+									}
+								}
+								message.setStatus(MessageStatus.success);
+								//send message back
+								sendMessage(clientSocket, message);				
+							}
+							else {
+								//TODO: gameplay
+								Message message = receivedMessage;
+								if (receivedMessage.getUser().getUserType() == UserType.player) {
+									if(receivedMessage.getType() == MessageType.joinTable) {
+										//single player
+										if(receivedMessage.getValue() == 1) {
+											for(int i = 0; i < tableList.size(); i++) {
+												if(tableList.get(i).getPlayerCount() == 0) {
+													tableList.get(i).addPlayer(receivedMessage.getUser(), clientSocket);
+													tableList.get(i).setFull(true);
+													message.setStatus(MessageStatus.success);
+													message.setTable(tableList.get(i));
+													break;
+												}
+											}
+										}
+										//multi player
+										else {	//TODO: double check
+											for(int i = 0; i < tableList.size(); i++) {
+												if(tableList.get(i).getFull() != true) {
+													if(tableList.get(i).getPlayerCount() == 1) {
+														tableList.get(i).joinTime= System.currentTimeMillis() / 1000;
+													}
+													tableList.get(i).addPlayer(receivedMessage.getUser(), clientSocket);
+													message.setStatus(MessageStatus.failure);
+													message.setTable(tableList.get(i));
+													break;
+												}
 											}
 										}
 									}
-									//multi player
-									else {
-										for(int i = 0; i < tableList.size(); i++) {
-											if(tableList.get(i).getFull() != true) {
-												tableList.get(i).addPlayer(receivedMessage.getUser(), clientSocket);
-												message.setStatus(MessageStatus.failure);
-												message.setTable(tableList.get(i));
-												break;
-											}
-										}
+								}
+								else if (receivedMessage.getUser().getUserType() == UserType.dealer) {
+									if(receivedMessage.getType() == MessageType.joinTable) {
+										Table table = new Table();
+										table.addDealer(receivedMessage.getUser(), clientSocket);
+										message.setTable(table);
+										message.setStatus(MessageStatus.success);
 									}
-								}
-							}
-							else if (receivedMessage.getUser().getUserType() == UserType.dealer) {
-								if(receivedMessage.getType() == MessageType.joinTable) {
-									Table table = new Table();
-									table.addDealer(receivedMessage.getUser(), clientSocket);
-									message.setTable(table);
-									message.setStatus(MessageStatus.success);
-								}
-								else if(receivedMessage.getType() == MessageType.startGame) {
-									receivedMessage.getTable().setFull(true);
+									else if(receivedMessage.getType() == MessageType.startGame) {
+										receivedMessage.getTable().setFull(true);
+									}
+									else if(receivedMessage.getType() == MessageType.startGame) {
+										
+									}
 								}
 								
+								
+								sendMessage(clientSocket, message);
 							}
-							
-							
-							
-							message.setStatus(MessageStatus.success);
-							//send message back
-							sendMessage(clientSocket, message);
-							closeThread = true;	
 						}
-					}					
+						else {
+							for(int i = 0; i < tableList.size(); i++) {
+								long currentTime = System.currentTimeMillis() / 1000;
+								if (currentTime - tableList.get(i).joinTime >= 180) {
+									Message message = new Message(MessageType.dealRequest);
+									message.setTable(tableList.get(i));
+									message.setUser(tableList.get(i).getDealer());
+									sendMessage(tableList.get(i).clientList.get(0), message);
+								}
+
+							}
+						}
+					}
 				}	
 			}
 			catch (IOException | ClassNotFoundException e) {
