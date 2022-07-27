@@ -24,7 +24,7 @@ public class Client {
 				//startup menu
 				Boolean loggedIn = false;
 				Boolean signedUp = false;
-				while (loggedIn == true || signedUp == true) {
+				while (loggedIn == false && signedUp == false) {
 					Boolean menuChoiceSelected = false;
 					while (!menuChoiceSelected) {
 						System.out.println("What would you like to do?");
