@@ -42,7 +42,7 @@ public class Dealer extends User {
 	}*/
 	
 	public String toString() {
-		return (this.userID.toString() + ", " + this.name + ", "  + 0);
+		return (this.userID.toString() + "," + this.name + ","  + 0);
 	}
 	
 }

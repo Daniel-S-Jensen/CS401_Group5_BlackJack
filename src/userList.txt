@@ -1,2 +1,2 @@
-D1, John, 0
-P4, Adam, 200
+D1,John,0
+P4,Adam,200

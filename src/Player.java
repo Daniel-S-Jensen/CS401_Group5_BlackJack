@@ -50,7 +50,7 @@ public class Player extends User {
 	}
 	
 	public String toString() {
-		return (this.userID.toString() + ", " + this.name + ", " + this.accountBalance);
+		return (this.userID.toString() + "," + this.name + "," + this.accountBalance);
 	}
 
 	public double getPayoutFactor() {

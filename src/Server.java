@@ -531,7 +531,7 @@ public class Server {
 
 
 		private void loadLoginList() {
-			String filename = "loginList.txt";
+			String filename = "loginList.txt";	
 			try {
 				File inFile = new File(filename);
 				Scanner input = new Scanner(inFile);
