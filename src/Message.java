@@ -3,7 +3,7 @@ import java.io.Serializable;
 public class Message implements Serializable {
 	protected MessageType type;
 	protected MessageStatus status;
-	protected int value;
+	protected double value;
 	protected String name;				//for signup
 	protected String username;			//for login
 	protected String password;			//for login
@@ -28,11 +28,11 @@ public class Message implements Serializable {
 		this.status = status;
 	}
 
-	public int getValue() {
+	public double getValue() {
 		return value;
 	}
 
-	public void setValue(int value) {
+	public void setValue(double value) {
 		this.value = value;
 	}
 

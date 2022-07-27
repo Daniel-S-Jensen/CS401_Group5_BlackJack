@@ -15,4 +15,6 @@ public enum MessageType {
 	betRequest,
 	endGame,
 	payoutRequest,
+	gameOver,
+	playAgain
 }

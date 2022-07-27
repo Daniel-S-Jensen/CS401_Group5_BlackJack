@@ -4,6 +4,7 @@ public class Player extends User {
 	//attributes
 	private int accountBalance;		//holds the amount of money in the player's account
 	private int betAmount;			//the amount the player bet for the current hand
+	private double payoutFactor;
 	
 	//constructor
 	public Player() {
@@ -34,7 +35,7 @@ public class Player extends User {
 	}
 	
 	//
-	public void receivePayout(int payout) {
+	public void receivePayout(double payout) {
 		this.accountBalance += payout;
 	}
 	
@@ -50,6 +51,14 @@ public class Player extends User {
 	
 	public String toString() {
 		return (this.userID.toString() + ", " + this.name + ", " + this.accountBalance);
+	}
+
+	public double getPayoutFactor() {
+		return payoutFactor;
+	}
+
+	public void setPayoutFactor(double payoutFactor) {
+		this.payoutFactor = payoutFactor;
 	}
 	
 	

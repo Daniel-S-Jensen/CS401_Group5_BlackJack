@@ -122,17 +122,10 @@ public class Client {
 					}
 				}	
 			}
-
-
-
-
-
 		}
 		catch (IOException e) {
 			e.printStackTrace();
 		}
-
-
 	}
 
 	//sends a message to server
@@ -536,13 +529,24 @@ public class Client {
 								activeUser = receivedMessage.getUser();
 								Boolean playAgain = true;
 								while (playAgain) {
+									Message message = new Message(MessageType.playAgain);
+									message.setUser(activeUser);
+									message.setPlayer(activePlayer);
+									message.setTable(receivedMessage.getTable());
+									message.setStatus(MessageStatus.success);
+									sendMessage(socket, message);
 									playAgain = playGame(socket, receivedMessage.getTable());
 									gameJoined = true;
 								}
+								Message message = new Message(MessageType.playAgain);
+								message.setUser(activeUser);
+								message.setTable(receivedMessage.getTable());
+								message.setStatus(MessageStatus.failure);
+								sendMessage(socket, message);
 							}
 							else if(receivedMessage.getStatus() == MessageStatus.failure) {
 								if(receivedMessage.getValue() != 2) {
-									int time = receivedMessage.getValue();
+									int time = (int) receivedMessage.getValue();
 									System.out.println("You are in a queue to join a table. The game will start in " + time + " seconds or when table reaches max players.");
 								}
 								else {
@@ -623,6 +627,9 @@ public class Client {
 									System.out.println(receivedMessage.getTable().getPlayers()[i-1].getName() + " has: " + receivedMessage.getTable().getDealer().getHand().toString());
 								}
 							}
+						}
+						else if (receivedMessage.getType() == MessageType.gameOver) {
+							gameOver = true;
 						}
 					}	
 					messageReceived = true;
@@ -721,6 +728,16 @@ public class Client {
 								else {
 									System.out.println(receivedMessage.getTable().getPlayers()[i-1].getName() + " has: " + receivedMessage.getTable().getDealer().getHand().toString());
 								}
+							}
+						}
+						else if (receivedMessage.getType() == MessageType.gameOver) {
+							if(receivedMessage.getValue() > 0) {
+								System.out.println("Players remaining");
+								gameOver = true;
+							}
+							else {
+								System.out.println("No players remaining");
+								gameOver = true;
 							}
 						}
 					}	

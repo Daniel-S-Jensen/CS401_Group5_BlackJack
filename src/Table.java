@@ -20,6 +20,8 @@ public class Table {
 	private Deck deck;
 	private int betCount;
 	private int playerTurn;
+	private int payoutcount;
+	private int playAgainCount;
 	
 	private ArrayList<Socket> clientList;
 	
@@ -33,6 +35,8 @@ public class Table {
 		this.full = false;
 		this.betCount = 0;
 		this.playerTurn = 0;
+		this.payoutcount = 0;
+		this.playAgainCount = 0;
 	}
 	
 	//adds a player to this table
@@ -130,6 +134,43 @@ public class Table {
 	public int getPlayerTurn() {
 		return this.playerTurn;
 	}
+
+	public int getPayoutcount() {
+		return payoutcount;
+	}
+
+	public void setPayoutcount(int payoutcount) {
+		this.payoutcount = payoutcount;
+	}
 	
+	public void incrementPayoutcount() {
+		this.payoutcount++;
+	}
 	
+	public int getPlayAgainCount() {
+		return playAgainCount;
+	}
+	
+	public void incrementPlayAgaincount() {
+		this.playAgainCount++;
+	}
+	
+	public void decrementPlayercount() {
+		this.playerCount--;
+	}
+	
+	public void setPlayers(Player[] players) {
+		this.players = players;
+	}
+
+	public void setClientList(ArrayList<Socket> clientList) {
+		this.clientList = clientList;
+	}
+
+	public void resetTable() {
+		this.betCount = 0;
+		this.playerTurn = 0;
+		this.payoutcount = 0;
+		this.playAgainCount= 0;
+	}
 }

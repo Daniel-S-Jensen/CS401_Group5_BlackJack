@@ -194,7 +194,6 @@ public class Server {
 								sendMessage(clientSocket, message);				
 							}
 							else {
-								//TODO: gameplay
 								Message message = receivedMessage;
 								if (receivedMessage.getUser().getUserType() == UserType.player) {
 									if(receivedMessage.getType() == MessageType.joinTable) {
@@ -212,7 +211,7 @@ public class Server {
 											}
 										}
 										//multi player
-										else {	//TODO: double check
+										else {
 											for(int i = 0; i < tableList.size(); i++) {
 												if(tableList.get(i).getFull() != true) {
 													if(tableList.get(i).getPlayerCount() == 0) {
@@ -250,6 +249,7 @@ public class Server {
 									}
 									else if(receivedMessage.getType() == MessageType.dealRequest) {
 										if (receivedMessage.getStatus() == MessageStatus.success) {
+											message.getTable().resetTable();
 											message.getTable().getDeck().shuffleDeck();
 											for (int i = 0; i <= message.getTable().getPlayerCount(); i++) {
 												if (i == 0) {
@@ -370,7 +370,115 @@ public class Server {
 									}
 									else if(receivedMessage.getType() == MessageType.endGame) {
 										if(receivedMessage.getStatus() == MessageStatus.success) {
-											
+											//calculates payout factors
+											if(receivedMessage.getTable().getDealer().getHand().getHandTotal() > 21) {
+												for (int i = 0; i < receivedMessage.getTable().getPlayerCount(); i++) {
+													if(receivedMessage.getTable().getPlayers()[i].getHand().getHandTotal() <= 21) {
+														receivedMessage.getTable().getPlayers()[i].setPayoutFactor(2.0);
+													}
+													else if(receivedMessage.getTable().getPlayers()[i].getHand().getHandTotal() > 21) {
+														receivedMessage.getTable().getPlayers()[i].setPayoutFactor(0.0);
+													}
+												}
+											}
+											else if(receivedMessage.getTable().getDealer().getHand().getHandTotal() == 21) {
+												for (int i = 0; i < receivedMessage.getTable().getPlayerCount(); i++) {
+													if(receivedMessage.getTable().getDealer().getHand().getNumCardsInHand() == 2) {
+														if(receivedMessage.getTable().getPlayers()[i].getHand().getHandTotal() == 21) {
+															if(receivedMessage.getTable().getPlayers()[i].getHand().getNumCardsInHand() == 2) {
+																receivedMessage.getTable().getPlayers()[i].setPayoutFactor(1.0);
+															}
+															else {
+																receivedMessage.getTable().getPlayers()[i].setPayoutFactor(0.0);
+															}
+														}
+													}
+													else {
+														receivedMessage.getTable().getPlayers()[i].setPayoutFactor(0.0);
+													}
+												}
+											}
+											else {	// dealer less than 21
+												for (int i = 0; i < receivedMessage.getTable().getPlayerCount(); i++) {
+													if(receivedMessage.getTable().getPlayers()[i].getHand().getHandTotal() == 21) {
+														if(receivedMessage.getTable().getDealer().getHand().getNumCardsInHand() == 2) {
+															receivedMessage.getTable().getPlayers()[i].setPayoutFactor(2.5);
+														}
+														else {
+															receivedMessage.getTable().getPlayers()[i].setPayoutFactor(2.0);
+														}
+													}
+													else if(receivedMessage.getTable().getPlayers()[i].getHand().getHandTotal() > 21) {
+														receivedMessage.getTable().getPlayers()[i].setPayoutFactor(0.0);
+													}
+													else {
+														if(receivedMessage.getTable().getPlayers()[i].getHand().getHandTotal() > receivedMessage.getTable().getDealer().getHand().getHandTotal()) {
+															receivedMessage.getTable().getPlayers()[i].setPayoutFactor(2.0);
+														}
+														else if(receivedMessage.getTable().getPlayers()[i].getHand().getHandTotal() == receivedMessage.getTable().getDealer().getHand().getHandTotal()) {
+															receivedMessage.getTable().getPlayers()[i].setPayoutFactor(1.0);
+														}
+														else {
+															receivedMessage.getTable().getPlayers()[i].setPayoutFactor(0.0);
+														}
+													}
+												}
+											}
+											//
+											message.setType(MessageType.payoutRequest);
+											message.setName(receivedMessage.getTable().getPlayers()[0].getName());
+											message.setTurn(true);
+											message.setUser(receivedMessage.getTable().getDealer());
+											message.setValue(receivedMessage.getTable().getPlayers()[0].getBet() * receivedMessage.getTable().getPlayers()[0].getPayoutFactor());
+											sendMessage(message.getTable().getClientList().get(1), message);
+										}
+									}
+									else if(receivedMessage.getType() == MessageType.payoutRequest) {
+										if(receivedMessage.getStatus() == MessageStatus.success) {
+											receivedMessage.getTable().incrementPayoutcount();
+											if (receivedMessage.getTable().getPayoutcount() == receivedMessage.getTable().getPlayerCount() - 1) {
+												//payouts done
+												message.setType(MessageType.gameOver);
+												message.setUser(receivedMessage.getTable().getPlayers()[0]);
+												message.setTurn(true);
+												sendMessage(clientSocket, message);
+											}
+											else {
+												message.setType(MessageType.payoutRequest);
+												message.setName(receivedMessage.getTable().getPlayers()[receivedMessage.getTable().getBetCount()].getName());
+												message.setValue(receivedMessage.getTable().getPlayers()[receivedMessage.getTable().getBetCount()].getBet() * receivedMessage.getTable().getPlayers()[receivedMessage.getTable().getBetCount()].getPayoutFactor());
+												message.setUser(receivedMessage.getTable().getDealer());
+												message.setTurn(true);
+												sendMessage(message.getTable().getClientList().get(receivedMessage.getTable().getBetCount() + 1), message);
+											}
+										}
+									}
+									else if(receivedMessage.getType() == MessageType.playAgain) {
+										if(receivedMessage.getStatus() == MessageStatus.success) {
+											receivedMessage.getTable().incrementPlayAgaincount();
+										}
+										else {
+											receivedMessage.getTable().incrementPlayAgaincount();
+											Player[] temp = new Player[receivedMessage.getTable().getPlayerCount()];
+											ArrayList<Socket> tempList = new ArrayList<Socket>();
+											for (int i = 0, k = 0; i < receivedMessage.getTable().getPlayerCount(); i++) {
+												tempList.add(receivedMessage.getTable().getClientList().get(0));
+												if (receivedMessage.getTable().getPlayers()[i] == receivedMessage.getUser()) {
+													tempList.add(receivedMessage.getTable().getClientList().get(i+1));
+													continue;
+												}
+												temp[k++] = receivedMessage.getTable().getPlayers()[i];
+											}
+											receivedMessage.getTable().decrementPlayercount();
+											receivedMessage.getTable().setPlayers(temp);
+											receivedMessage.getTable().setClientList(tempList);
+										}
+										if (receivedMessage.getTable().getPlayAgainCount() == receivedMessage.getTable().getPlayerCount() - 1) {
+											message.setType(MessageType.gameOver);
+											message.setUser(receivedMessage.getTable().getDealer());
+											message.setTurn(true);
+											message.setValue(receivedMessage.getTable().getPlayerCount());
+											sendMessage(receivedMessage.getTable().getClientList().get(0), message);
 										}
 									}
 								}
