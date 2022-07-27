@@ -595,7 +595,7 @@ public class Server {
 				String filename = "loginList.txt";
 				FileWriter outFile = new FileWriter(filename);
 				for (int i = 0; i < loginList.size(); i++) {
-					outFile.write(loginList.get(i).toString());
+					outFile.write(loginList.get(i).toString() + "\n");
 				}
 				outFile.close();
 			} catch (IOException e) {

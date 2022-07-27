@@ -44,7 +44,7 @@ public class Login {
 
 	@Override
 	public String toString() {
-		return username + ", " + password + ", " + userID.toString();
+		return username + "," + password + "," + userID.toString();
 	}
 	
 	
