@@ -6,6 +6,7 @@ public class Hand {
 	private Card[] hand;			//the hand of cards,
 	private int numCardsInHand;		//the number of cards in the hand
 	private int handTotal;			//the total value of the hand
+	private Boolean hasBust = false;
 	
 	//constructor
 	public Hand() {
@@ -29,6 +30,7 @@ public class Hand {
 		this.hand[numCardsInHand] = card;
 		this.numCardsInHand++;
 		this.handTotal += card.getValue();
+		this.checkHasBust();
 	}
 	
 	//converts hand to string
@@ -41,6 +43,27 @@ public class Hand {
 			}
 		}
 		return (string);
+	}
+	
+	private void checkHasBust() {
+		if (this.handTotal > 21) {
+			for (int i = 0; i < this.numCardsInHand; i++) {
+				if (this.hand[i].getIsAce() == true) {
+					this.hand[i].changeAce();
+					this.handTotal -= 10;
+				}
+				if (this.handTotal < 21) {
+					break;
+				}
+			}
+			if (this.handTotal > 21) {
+				this.hasBust = true;
+			}
+		}
+	}
+	
+	public Boolean getHasBust() {
+		return this.hasBust;
 	}
 	
 }

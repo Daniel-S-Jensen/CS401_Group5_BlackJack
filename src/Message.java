@@ -10,6 +10,7 @@ public class Message implements Serializable {
 	protected User user;				//
 	protected Table table;				//for joining games
 	protected Boolean userTurn;
+	protected Player player;
 
 	//constructors
 	public Message(MessageType type) {
@@ -63,6 +64,10 @@ public class Message implements Serializable {
 		return type;
 	}
 
+	public void setType(MessageType type) {
+		this.type = type;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -89,6 +94,16 @@ public class Message implements Serializable {
 
 	public void setTurn(Boolean userTurn) {
 		this.userTurn = userTurn;
+	}
+
+
+	public Player getPlayer() {
+		return player;
+	}
+
+
+	public void setPlayer(Player player) {
+		this.player = player;
 	}
 
 	

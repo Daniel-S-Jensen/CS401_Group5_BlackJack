@@ -21,6 +21,14 @@ public class Deck {
 		return card;
 	}
 	
+	//returns the top card from the deck and "removes" it
+	public Card drawFaceDownCard() {
+		Card card = this.cards[this.numberOfCardsLeft - 1];
+		this.numberOfCardsLeft--;
+		card.setIsFacedown(true);
+		return card;
+	}
+	
 	//shuffles the deck
 	public void shuffleDeck() {
 		List<Card> cardList = Arrays.asList(this.cards);

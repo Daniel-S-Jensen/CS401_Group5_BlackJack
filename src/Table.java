@@ -14,11 +14,14 @@ public class Table {
 	private Boolean dealerAssigned;
 	private Dealer dealer;
 	private int playerCount;
-	public Player[] players;
+	private Player[] players;
 	private Boolean full;
-	public long joinTime;
+	private long joinTime;
+	private Deck deck;
+	private int betCount;
+	private int playerTurn;
 	
-	public ArrayList<Socket> clientList;
+	private ArrayList<Socket> clientList;
 	
 	//constructor
 	public Table() {
@@ -28,6 +31,8 @@ public class Table {
 		this.playerCount = 0;
 		this.clientList = new ArrayList<Socket>();
 		this.full = false;
+		this.betCount = 0;
+		this.playerTurn = 0;
 	}
 	
 	//adds a player to this table
@@ -45,6 +50,7 @@ public class Table {
 		this.dealer = (Dealer) user;
 		dealerAssigned = true;
 		this.clientList.add(socket);
+		this.deck = this.dealer.getDeck();
 	}
 	
 	private void updateClients(Socket socket, Message message) {
@@ -87,6 +93,42 @@ public class Table {
 	
 	public Dealer getDealer() {
 		return this.dealer;
+	}
+	
+	public Deck getDeck() {
+		return this.deck;
+	}
+	
+	public Player[] getPlayers() {
+		return this.players;
+	}
+
+	public long getJoinTime() {
+		return joinTime;
+	}
+
+	public void setJoinTime(long joinTime) {
+		this.joinTime = joinTime;
+	}
+
+	public ArrayList<Socket> getClientList() {
+		return clientList;
+	}
+	
+	public void incrementBetCount() {
+		this.betCount++;
+	}
+	
+	public int getBetCount() {
+		return this.betCount;
+	}
+	
+	public void incrementPlayerTurn() {
+		this.playerTurn++;
+	}
+	
+	public int getPlayerTurn() {
+		return this.playerTurn;
 	}
 	
 	

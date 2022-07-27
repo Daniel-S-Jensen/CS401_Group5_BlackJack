@@ -132,4 +132,9 @@ public class Card {
 		return (this.rankString + " of " + this.suitString);
 	}
 	
+	public void changeAce() {
+		if (this.isAce == true) {
+			this.cardValue = 1;
+		}
+	}
 }

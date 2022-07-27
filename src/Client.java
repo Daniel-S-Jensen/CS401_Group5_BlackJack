@@ -600,10 +600,12 @@ public class Client {
 										if (menuChoice == '1') {
 											activePlayer.hit();
 											menuChoiceSelected = true;
+											message.setValue(1);
 										}
 										else if (menuChoice == '2') {
 											activePlayer.stand();
 											menuChoiceSelected = true;
+											message.setValue(2);
 										}
 									}
 									message.setUser(activeUser);
@@ -618,7 +620,7 @@ public class Client {
 									System.out.println(receivedMessage.getTable().getDealer().getName() + " has: " + receivedMessage.getTable().getDealer().getHand().toString());
 								}
 								else {
-									System.out.println(receivedMessage.getTable().players[i-1].getName() + " has: " + receivedMessage.getTable().getDealer().getHand().toString());
+									System.out.println(receivedMessage.getTable().getPlayers()[i-1].getName() + " has: " + receivedMessage.getTable().getDealer().getHand().toString());
 								}
 							}
 						}
@@ -717,7 +719,7 @@ public class Client {
 									System.out.println(receivedMessage.getTable().getDealer().getName() + " has: " + receivedMessage.getTable().getDealer().getHand().toString());
 								}
 								else {
-									System.out.println(receivedMessage.getTable().players[i-1].getName() + " has: " + receivedMessage.getTable().getDealer().getHand().toString());
+									System.out.println(receivedMessage.getTable().getPlayers()[i-1].getName() + " has: " + receivedMessage.getTable().getDealer().getHand().toString());
 								}
 							}
 						}

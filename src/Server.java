@@ -206,6 +206,7 @@ public class Server {
 													tableList.get(i).setFull(true);
 													message.setStatus(MessageStatus.success);
 													message.setTable(tableList.get(i));
+													sendMessage(clientSocket, message);
 													break;
 												}
 											}
@@ -214,15 +215,25 @@ public class Server {
 										else {	//TODO: double check
 											for(int i = 0; i < tableList.size(); i++) {
 												if(tableList.get(i).getFull() != true) {
-													if(tableList.get(i).getPlayerCount() == 1) {
-														tableList.get(i).joinTime= System.currentTimeMillis() / 1000;
+													if(tableList.get(i).getPlayerCount() == 0) {
+														tableList.get(i).setJoinTime(System.currentTimeMillis() / 1000);
 													}
 													tableList.get(i).addPlayer(receivedMessage.getUser(), clientSocket);
 													message.setStatus(MessageStatus.failure);
 													message.setTable(tableList.get(i));
+													sendMessage(clientSocket, message);
 													break;
 												}
 											}
+										}
+									}
+									else if(receivedMessage.getType() == MessageType.requestBet) {
+										if(receivedMessage.getValue() >= 0) {
+											message.setType(MessageType.betRequest);
+											message.setName(receivedMessage.getTable().getPlayers()[0].getName());
+											message.setValue(receivedMessage.getValue());
+											message.setUser(receivedMessage.getTable().getPlayers()[0]);
+											sendMessage(clientSocket, message);
 										}
 									}
 								}
@@ -232,27 +243,81 @@ public class Server {
 										table.addDealer(receivedMessage.getUser(), clientSocket);
 										message.setTable(table);
 										message.setStatus(MessageStatus.success);
+										sendMessage(clientSocket, message);
 									}
 									else if(receivedMessage.getType() == MessageType.startGame) {
 										receivedMessage.getTable().setFull(true);
 									}
-									else if(receivedMessage.getType() == MessageType.startGame) {
+									else if(receivedMessage.getType() == MessageType.dealRequest) {
+										if (receivedMessage.getStatus() == MessageStatus.success) {
+											message.getTable().getDeck().shuffleDeck();
+											for (int i = 0; i <= message.getTable().getPlayerCount(); i++) {
+												if (i == 0) {
+													message.getTable().getDealer().getHand().addCard(message.getTable().getDeck().drawCard());
+													message.getTable().getDealer().getHand().addCard(message.getTable().getDeck().drawFaceDownCard());
+												}
+												else {
+													message.getTable().getPlayers()[i].getHand().addCard(message.getTable().getDeck().drawCard());
+													message.getTable().getPlayers()[i].getHand().addCard(message.getTable().getDeck().drawCard());
+												}
+											}
+											message.setType(MessageType.update);
+											for(int i = 0; i < message.getTable().getClientList().size(); i++) {
+												sendMessage(message.getTable().getClientList().get(i), message);
+											}
+											
+											//cards dealt now start first turn
+											Message startRound = message;
+											startRound.setType(MessageType.requestGameAction);
+											startRound.setUser(receivedMessage.getTable().getPlayers()[0]);
+											startRound.setTurn(true);
+											sendMessage(message.getTable().getClientList().get(1), startRound);
+										}
+									}
+									else if(receivedMessage.getType() == MessageType.betRequest) {
+										if(receivedMessage.getStatus() == MessageStatus.success) {
+											receivedMessage.getTable().incrementBetCount();
+											if (receivedMessage.getTable().getBetCount() == receivedMessage.getTable().getPlayerCount() - 1) {
+												message.setType(MessageType.dealRequest);
+												message.setUser(receivedMessage.getTable().getPlayers()[0]);
+												message.setTurn(true);
+												sendMessage(clientSocket, message);
+											}
+											else {
+												message.setType(MessageType.requestGameAction);
+												message.setUser(receivedMessage.getTable().getPlayers()[receivedMessage.getTable().getBetCount()]);
+												message.setTurn(true);
+												sendMessage(message.getTable().getClientList().get(receivedMessage.getTable().getBetCount() + 1), message);
+											}
+										}
+									}
+									else if(receivedMessage.getType() == MessageType.requestGameAction) {
+										if (receivedMessage.getValue() == 1) {
+											message.setType(MessageType.hitRequest);
+											message.setName(receivedMessage.getUser().getName());
+											message.setUser(receivedMessage.getTable().getPlayers()[0]);
+											message.setTurn(true);
+											sendMessage(clientSocket, message);
+										}
+										else {
+											
+										}
+										
+									}
+									else if(receivedMessage.getType() == MessageType.hitRequest) {
 										
 									}
 								}
-								
-								
-								sendMessage(clientSocket, message);
 							}
 						}
 						else {
 							for(int i = 0; i < tableList.size(); i++) {
 								long currentTime = System.currentTimeMillis() / 1000;
-								if (currentTime - tableList.get(i).joinTime >= 180) {
-									Message message = new Message(MessageType.dealRequest);
+								if (currentTime - tableList.get(i).getJoinTime() >= 180) {
+									Message message = new Message(MessageType.requestBet);
 									message.setTable(tableList.get(i));
 									message.setUser(tableList.get(i).getDealer());
-									sendMessage(tableList.get(i).clientList.get(0), message);
+									sendMessage(tableList.get(i).getClientList().get(0), message);
 								}
 
 							}
