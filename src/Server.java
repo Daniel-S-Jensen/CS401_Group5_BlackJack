@@ -4,11 +4,11 @@ import java.util.*;
 
 public class Server {
 
-	private static ArrayList<Dealer> dealerList;
-	private static ArrayList<Player> playerList;
-	private static ArrayList<Login> loginList;
+	private static ArrayList<Dealer> dealerList = new ArrayList<Dealer>();
+	private static ArrayList<Player> playerList = new ArrayList<Player>();
+	private static ArrayList<Login> loginList = new ArrayList<Login>();
 	
-	private static ArrayList<Table> tableList;
+	private static ArrayList<Table> tableList = new ArrayList<Table>();
 
 	Player test = new Player();
 
