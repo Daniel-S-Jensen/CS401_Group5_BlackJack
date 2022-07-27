@@ -292,20 +292,86 @@ public class Server {
 										}
 									}
 									else if(receivedMessage.getType() == MessageType.requestGameAction) {
-										if (receivedMessage.getValue() == 1) {
+										if (receivedMessage.getValue() == 1) {	//hit
 											message.setType(MessageType.hitRequest);
 											message.setName(receivedMessage.getUser().getName());
+											if (receivedMessage.getUser().getUserType() == UserType.player) {
+												Player temp;
+												temp = (Player) receivedMessage.getUser();
+												message.setPlayer(temp);
+											}
+											else {
+												message.setPlayer(null);
+											}
 											message.setUser(receivedMessage.getTable().getPlayers()[0]);
 											message.setTurn(true);
 											sendMessage(clientSocket, message);
 										}
-										else {
-											
+										else {	//stay
+											if (receivedMessage.getPlayer() != null) {
+												message.getTable().incrementPlayerTurn();
+												if (message.getTable().getPlayerTurn() > message.getTable().getPlayerCount()) {
+													message.setUser(receivedMessage.getTable().getDealer());
+												}
+												else {
+													message.setUser(receivedMessage.getTable().getPlayers()[receivedMessage.getTable().getPlayerTurn()]);
+												}
+												message.setType(MessageType.requestGameAction);
+												message.setTurn(true);
+												sendMessage(clientSocket, message);
+											}
+											else {
+												message.setType(MessageType.endGame);
+												message.setUser(receivedMessage.getTable().getDealer());
+												message.setTurn(true);
+												sendMessage(clientSocket, message);
+											}
 										}
-										
 									}
 									else if(receivedMessage.getType() == MessageType.hitRequest) {
-										
+										if(receivedMessage.getStatus() == MessageStatus.success) {
+											if (receivedMessage.getPlayer() != null) {
+												message.getTable().getPlayers()[message.getTable().getPlayerTurn()].getHand().addCard(message.getTable().getDeck().drawCard());
+												if(message.getTable().getPlayers()[message.getTable().getPlayerTurn()].getHand().getHasBust() != true) {
+													message.setType(MessageType.requestGameAction);
+													message.setUser(receivedMessage.getTable().getPlayers()[receivedMessage.getTable().getPlayerTurn()]);
+													message.setTurn(true);
+													sendMessage(clientSocket, message);
+												}
+												else {
+													message.getTable().incrementPlayerTurn();
+													if (message.getTable().getPlayerTurn() > message.getTable().getPlayerCount()) {
+														message.setUser(receivedMessage.getTable().getDealer());
+													}
+													else {
+														message.setUser(receivedMessage.getTable().getPlayers()[receivedMessage.getTable().getPlayerTurn()]);
+													}
+													message.setType(MessageType.requestGameAction);
+													message.setTurn(true);
+													sendMessage(clientSocket, message);
+												}
+											}
+											else {
+												message.getTable().getDealer().getHand().addCard(message.getTable().getDeck().drawCard());
+												if(message.getTable().getDealer().getHand().getHasBust() != true) {
+													message.setType(MessageType.requestGameAction);
+													message.setUser(receivedMessage.getTable().getDealer());
+													message.setTurn(true);
+													sendMessage(clientSocket, message);
+												}
+												else if(message.getTable().getDealer().getHand().getHasBust() == true) {
+													message.setType(MessageType.endGame);
+													message.setUser(receivedMessage.getTable().getDealer());
+													message.setTurn(true);
+													sendMessage(clientSocket, message);
+												}
+											}
+										}
+									}
+									else if(receivedMessage.getType() == MessageType.endGame) {
+										if(receivedMessage.getStatus() == MessageStatus.success) {
+											
+										}
 									}
 								}
 							}
