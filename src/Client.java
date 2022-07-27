@@ -4,9 +4,9 @@ import java.util.*;
 
 public class Client {
 
-	private static User activeUser;
-	private static Player activePlayer;
-	private static Dealer activeDealer;
+	private static User activeUser = new User();
+	private static Player activePlayer = new Player();
+	private static Dealer activeDealer = new Dealer();
 	private final static String ClientError = "Error. Logging out. Please login again and retry.";
 
 	//client driver

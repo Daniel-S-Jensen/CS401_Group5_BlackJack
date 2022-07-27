@@ -549,7 +549,7 @@ public class Server {
 				}
 				UserID temp = new UserID();
 				temp.loadCount(loginList.size());
-				input.close();
+				//input.close();
 
 			}
 			catch (FileNotFoundException e) {
