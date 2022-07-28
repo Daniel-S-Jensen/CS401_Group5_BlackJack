@@ -1,0 +1,43 @@
+Date:	6/8/22
+Who:
+	Daniel Jensen
+	Chun Yin Lee
+
+Notes:
+
+Requirement Questions:
+
+What are the standard rules for blackjack? Do we follow the Bicycle rules for blackjack?
+
+How many players max/min?
+Is the dealer real or AI?
+
+Money:
+Minimum and maximum bets
+Poker chips, or dollar amounts
+Is there a limit on adding, withdrawing funds
+
+GUI:
+Text or also graphics
+	If graphics, what cards/table look like
+
+Rules:
+Standard rules?
+
+Gameplay:
+Single deck or multi-deck
+Permission to join game?
+Handling joining/leaving game.
+
+
+Cheating:
+What do you mean by cheating?
+Popular ways for cheating?
+
+System:
+How do users login?
+User id/name system? Passwords?
+User system for allowing new players?
+Do we need to be able to remove old players?
+
+What happens when someone runs out of money?

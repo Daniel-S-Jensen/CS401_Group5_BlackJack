@@ -1,0 +1,16 @@
+Who was there:
+	Daniel
+	Chen
+	Aastha
+
+Where:
+	Discord messages in server
+
+Date:
+	7/22/22
+
+What was decided:
+	Break down of work
+		Daniel - coding implementation as console
+		Chen - help with coding, mainly class designs, and catching errors, tests, also updating documentation
+		Aastha - GUI

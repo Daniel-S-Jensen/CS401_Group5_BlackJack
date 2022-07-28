@@ -1,0 +1,47 @@
+Date:	6/13/22 6:15PM-7:30PM
+Who:
+	Daniel Jensen
+	Chun Yin Lee
+	Ka Yee Ching
+	Aastha Sharma
+
+
+Notes:
+Questions:
+
+
+How do we handle shrinking table size?
+	Cannot add to table, 5 goes to 4.
+
+Project:
+Users should be able to play with each other.
+Users should have login credentials
+Users should be able to add funds to their account.
+Users should be able to cash out their accounts.
+Game play should follow standard black jack rules.
+Users should not be able to cheat.
+Only admin besides individual user should be able to see balance and login credentials.
+Users should be able to log out.
+Users can not have multiple accounts.
+Users can not join multiple game instances.
+Employee accounts, nonbalance, for dealer.
+
+Players
+	-5 max players per game, can handle multiple games
+	-one player minimum + dealer
+	-cant join game currently in session, join queue or play by themselves
+
+Dealer AI or person?
+	Real life is a person but not player, or AI. Non-player person (employee).
+	One dealer per table, only one table per dealer. Dealer uses dealer accounts.
+	
+Runs out of money at table? &&
+Do players have to wait for the "round" to be over before they leave?
+	Can leave when they want. Can forfeit and leave and immediately.
+
+Cards get reshuffled cards between rounds. Single deck.
+-no random cards, can only use card once
+
+blackjack insurance not necessary
+
+one deck, reshuffle between decks
